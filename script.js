@@ -1,12 +1,20 @@
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
 
+
+// ===============================
+// CHỈNH KÍCH THƯỚC MÀN HÌNH
+// ===============================
+
 function resizeCanvas() {
-    canvas.width = canvas.clientWidth;
-    canvas.height = canvas.clientHeight;
+
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
 }
 
 window.addEventListener("resize", resizeCanvas);
+
 resizeCanvas();
 
 
@@ -15,653 +23,56 @@ resizeCanvas();
 // ===============================
 
 const player = {
+
     x: 0,
     y: 0,
-    size: 16,
+
     speed: 4,
+
     health: 100,
-    hunger: 100,
-    wood: 0,
-    stone: 0
+    energy: 100,
+
+    direction: "down"
+
 };
+
+
+// ===============================
+// BÀN PHÍM
+// ===============================
 
 const keys = {};
 
-document.addEventListener("keydown", (event) => {
+document.addEventListener("keydown", function(event) {
+
     keys[event.key.toLowerCase()] = true;
+
 });
 
-document.addEventListener("keyup", (event) => {
+document.addEventListener("keyup", function(event) {
+
     keys[event.key.toLowerCase()] = false;
+
 });
 
 
 // ===============================
-// THẾ GIỚI CHIA THEO CHUNK
+// HÀM NGẪU NHIÊN THEO TỌA ĐỘ
+//
+// CÙNG MỘT VỊ TRÍ SẼ LUÔN CÓ
+// CÙNG MỘT MẢNH THẾ GIỚI
 // ===============================
 
-// Mỗi chunk là một khu vực 400 x 400
-const chunkSize = 400;
+function random(x, y, seed = 1) {
 
-// Lưu những chunk đã tạo
-const chunks = new Map();
+    const value = Math.sin(
+        x * 12.9898 +
+        y * 78.233 +
+        seed * 37.719
+    ) * 43758.5453;
 
+    return value - Math.floor(value);
 
-// Hàm tạo số ngẫu nhiên giống nhau
-// cùng một vị trí luôn tạo ra cùng thế giới
-function randomFromSeed(x, y, seed = 1) {
-    const number =
-        Math.sin(
-            x * 12.9898 +
-            y * 78.233 +
-            seed * 37.719
-        ) * 43758.5453;
-
-    return number - Math.floor(number);
-}
-
-
-// ===============================
-// TẠO MỘT CHUNK TỰ NHIÊN
-// ===============================
-
-function generateChunk(chunkX, chunkY) {
-
-    const key = chunkX + "," + chunkY;
-
-    if (chunks.has(key)) {
-        return chunks.get(key);
-    }
-
-    const chunk = {
-        trees: [],
-        rocks: [],
-        coal: [],
-        iron: [],
-        gold: [],
-        water: [],
-        grass: []
-    };
-
-    // Vị trí thật của chunk
-    const startX = chunkX * chunkSize;
-    const startY = chunkY * chunkSize;
-
-
-    // -------------------------------
-    // ĐỊA HÌNH CỎ
-    // -------------------------------
-
-    for (let i = 0; i < 100; i++) {
-
-        const x =
-            startX +
-            randomFromSeed(
-                i,
-                chunkX * 100 + chunkY,
-                1
-            ) * chunkSize;
-
-        const y =
-            startY +
-            randomFromSeed(
-                i,
-                chunkX * 200 + chunkY,
-                2
-            ) * chunkSize;
-
-        chunk.grass.push({
-            x: x,
-            y: y
-        });
-    }
-
-
-    // -------------------------------
-    // CÂY NGẪU NHIÊN
-    // -------------------------------
-
-    // Có vùng rừng rất dày
-    const forestLevel =
-        randomFromSeed(chunkX, chunkY, 10);
-
-    let treeCount;
-
-    if (forestLevel > 0.75) {
-        treeCount = 90;
-    } else if (forestLevel > 0.5) {
-        treeCount = 50;
-    } else {
-        treeCount = 20;
-    }
-
-    for (let i = 0; i < treeCount; i++) {
-
-        const x =
-            startX +
-            randomFromSeed(
-                i,
-                chunkX,
-                chunkY + 20
-            ) * chunkSize;
-
-        const y =
-            startY +
-            randomFromSeed(
-                i,
-                chunkY,
-                chunkX + 30
-            ) * chunkSize;
-
-        const size =
-            20 +
-            randomFromSeed(
-                i,
-                chunkX + chunkY,
-                40
-            ) * 16;
-
-        chunk.trees.push({
-            x: x,
-            y: y,
-            size: size
-        });
-    }
-
-
-    // -------------------------------
-    // ĐÁ
-    // -------------------------------
-
-    const rockCount =
-        10 +
-        Math.floor(
-            randomFromSeed(chunkX, chunkY, 50) * 30
-        );
-
-    for (let i = 0; i < rockCount; i++) {
-
-        const x =
-            startX +
-            randomFromSeed(
-                i,
-                chunkX + 50,
-                chunkY
-            ) * chunkSize;
-
-        const y =
-            startY +
-            randomFromSeed(
-                i,
-                chunkY + 70,
-                chunkX
-            ) * chunkSize;
-
-        chunk.rocks.push({
-            x: x,
-            y: y,
-            size: 12 + Math.random() * 12
-        });
-    }
-
-
-    // -------------------------------
-    // THAN
-    // -------------------------------
-
-    const coalCount =
-        Math.floor(
-            randomFromSeed(chunkX, chunkY, 70) * 12
-        );
-
-    for (let i = 0; i < coalCount; i++) {
-
-        chunk.coal.push({
-            x:
-                startX +
-                randomFromSeed(
-                    i,
-                    chunkX + 90,
-                    chunkY
-                ) * chunkSize,
-
-            y:
-                startY +
-                randomFromSeed(
-                    i,
-                    chunkY + 100,
-                    chunkX
-                ) * chunkSize
-        });
-    }
-
-
-    // -------------------------------
-    // SẮT
-    // -------------------------------
-
-    const ironCount =
-        Math.floor(
-            randomFromSeed(chunkX, chunkY, 80) * 8
-        );
-
-    for (let i = 0; i < ironCount; i++) {
-
-        chunk.iron.push({
-            x:
-                startX +
-                randomFromSeed(
-                    i,
-                    chunkX + 120,
-                    chunkY
-                ) * chunkSize,
-
-            y:
-                startY +
-                randomFromSeed(
-                    i,
-                    chunkY + 130,
-                    chunkX
-                ) * chunkSize
-        });
-    }
-
-
-    // -------------------------------
-    // VÀNG - HIẾM
-    // -------------------------------
-
-    if (
-        randomFromSeed(
-            chunkX,
-            chunkY,
-            200
-        ) > 0.7
-    ) {
-
-        const goldCount =
-            1 +
-            Math.floor(
-                randomFromSeed(
-                    chunkX,
-                    chunkY,
-                    210
-                ) * 4
-            );
-
-        for (let i = 0; i < goldCount; i++) {
-
-            chunk.gold.push({
-                x:
-                    startX +
-                    randomFromSeed(
-                        i,
-                        chunkX + 220,
-                        chunkY
-                    ) * chunkSize,
-
-                y:
-                    startY +
-                    randomFromSeed(
-                        i,
-                        chunkY + 230,
-                        chunkX
-                    ) * chunkSize
-            });
-        }
-    }
-
-
-    // -------------------------------
-    // HỒ NƯỚC NGẪU NHIÊN
-    // -------------------------------
-
-    if (
-        randomFromSeed(
-            chunkX,
-            chunkY,
-            300
-        ) > 0.72
-    ) {
-
-        const waterX =
-            startX +
-            randomFromSeed(
-                chunkX,
-                chunkY,
-                301
-            ) * chunkSize;
-
-        const waterY =
-            startY +
-            randomFromSeed(
-                chunkX,
-                chunkY,
-                302
-            ) * chunkSize;
-
-        chunk.water.push({
-            x: waterX,
-            y: waterY,
-
-            width:
-                50 +
-                randomFromSeed(
-                    chunkX,
-                    chunkY,
-                    303
-                ) * 120,
-
-            height:
-                30 +
-                randomFromSeed(
-                    chunkX,
-                    chunkY,
-                    304
-                ) * 80
-        });
-    }
-
-
-    chunks.set(key, chunk);
-
-    return chunk;
-}
-
-
-// ===============================
-// VẼ CỎ
-// ===============================
-
-function drawGrass(chunk) {
-
-    for (const grass of chunk.grass) {
-
-        ctx.fillStyle = "#3d8a36";
-
-        ctx.fillRect(
-            grass.x - player.x + canvas.width / 2,
-            grass.y - player.y + canvas.height / 2,
-            2,
-            5
-        );
-    }
-}
-
-
-// ===============================
-// VẼ HỒ
-// ===============================
-
-function drawWater(chunk) {
-
-    for (const water of chunk.water) {
-
-        const x =
-            water.x -
-            player.x +
-            canvas.width / 2;
-
-        const y =
-            water.y -
-            player.y +
-            canvas.height / 2;
-
-        ctx.fillStyle = "#2496d3";
-
-        ctx.beginPath();
-
-        ctx.ellipse(
-            x,
-            y,
-            water.width,
-            water.height,
-            0,
-            0,
-            Math.PI * 2
-        );
-
-        ctx.fill();
-
-
-        ctx.strokeStyle = "#5bc0eb";
-        ctx.lineWidth = 3;
-
-        ctx.beginPath();
-
-        ctx.ellipse(
-            x,
-            y,
-            water.width,
-            water.height,
-            0,
-            0,
-            Math.PI * 2
-        );
-
-        ctx.stroke();
-    }
-}
-
-
-// ===============================
-// VẼ CÂY
-// ===============================
-
-function drawTrees(chunk) {
-
-    for (const tree of chunk.trees) {
-
-        const x =
-            tree.x -
-            player.x +
-            canvas.width / 2;
-
-        const y =
-            tree.y -
-            player.y +
-            canvas.height / 2;
-
-
-        // Thân
-        ctx.fillStyle = "#704214";
-
-        ctx.fillRect(
-            x - 5,
-            y,
-            10,
-            tree.size
-        );
-
-
-        // Tán cây
-        ctx.fillStyle = "#176b2c";
-
-        ctx.beginPath();
-
-        ctx.arc(
-            x,
-            y - tree.size / 2,
-            tree.size,
-            0,
-            Math.PI * 2
-        );
-
-        ctx.fill();
-
-
-        // Lá sáng
-        ctx.fillStyle = "#25833a";
-
-        ctx.beginPath();
-
-        ctx.arc(
-            x - tree.size / 3,
-            y - tree.size / 2,
-            tree.size * 0.6,
-            0,
-            Math.PI * 2
-        );
-
-        ctx.fill();
-    }
-}
-
-
-// ===============================
-// VẼ ĐÁ
-// ===============================
-
-function drawRocks(chunk) {
-
-    for (const rock of chunk.rocks) {
-
-        const x =
-            rock.x -
-            player.x +
-            canvas.width / 2;
-
-        const y =
-            rock.y -
-            player.y +
-            canvas.height / 2;
-
-        ctx.fillStyle = "#666";
-
-        ctx.beginPath();
-
-        ctx.arc(
-            x,
-            y,
-            rock.size,
-            0,
-            Math.PI * 2
-        );
-
-        ctx.fill();
-
-
-        ctx.fillStyle = "#999";
-
-        ctx.beginPath();
-
-        ctx.arc(
-            x - rock.size / 3,
-            y - rock.size / 3,
-            rock.size / 3,
-            0,
-            Math.PI * 2
-        );
-
-        ctx.fill();
-    }
-}
-
-
-// ===============================
-// VẼ KHOÁNG SẢN
-// ===============================
-
-function drawMineral(
-    minerals,
-    color,
-    size = 10
-) {
-
-    for (const mineral of minerals) {
-
-        const x =
-            mineral.x -
-            player.x +
-            canvas.width / 2;
-
-        const y =
-            mineral.y -
-            player.y +
-            canvas.height / 2;
-
-        ctx.fillStyle = color;
-
-        ctx.beginPath();
-
-        ctx.arc(
-            x,
-            y,
-            size,
-            0,
-            Math.PI * 2
-        );
-
-        ctx.fill();
-    }
-}
-
-
-// ===============================
-// VẼ THẾ GIỚI
-// ===============================
-
-function drawWorld() {
-
-    // Nền cỏ vô tận
-    ctx.fillStyle = "#4d963f";
-
-    ctx.fillRect(
-        0,
-        0,
-        canvas.width,
-        canvas.height
-    );
-
-
-    const currentChunkX =
-        Math.floor(player.x / chunkSize);
-
-    const currentChunkY =
-        Math.floor(player.y / chunkSize);
-
-
-    // Tạo và vẽ 9 chunk xung quanh
-    // Đi sang vùng mới sẽ tự sinh thêm
-    for (
-        let y = currentChunkY - 2;
-        y <= currentChunkY + 2;
-        y++
-    ) {
-
-        for (
-            let x = currentChunkX - 2;
-            x <= currentChunkX + 2;
-            x++
-        ) {
-
-            const chunk =
-                generateChunk(x, y);
-
-            drawGrass(chunk);
-            drawWater(chunk);
-            drawTrees(chunk);
-            drawRocks(chunk);
-
-            drawMineral(
-                chunk.coal,
-                "#222",
-                8
-            );
-
-            drawMineral(
-                chunk.iron,
-                "#a65d36",
-                8
-            );
-
-            drawMineral(
-                chunk.gold,
-                "#ffd60a",
-                8
-            );
-        }
-    }
 }
 
 
@@ -671,135 +82,350 @@ function drawWorld() {
 
 function updatePlayer() {
 
-    let dx = 0;
-    let dy = 0;
-
-    if (keys["w"]) dy -= 1;
-    if (keys["s"]) dy += 1;
-    if (keys["a"]) dx -= 1;
-    if (keys["d"]) dx += 1;
+    let moveX = 0;
+    let moveY = 0;
 
 
-    // Di chuyển chéo không nhanh hơn
-    if (dx !== 0 && dy !== 0) {
-        dx *= 0.707;
-        dy *= 0.707;
+    if (keys["w"]) {
+
+        moveY -= 1;
+
+        player.direction = "up";
+
     }
 
-    player.x += dx * player.speed;
-    player.y += dy * player.speed;
+
+    if (keys["s"]) {
+
+        moveY += 1;
+
+        player.direction = "down";
+
+    }
+
+
+    if (keys["a"]) {
+
+        moveX -= 1;
+
+        player.direction = "left";
+
+    }
+
+
+    if (keys["d"]) {
+
+        moveX += 1;
+
+        player.direction = "right";
+
+    }
+
+
+    // Không cho đi chéo nhanh hơn
+
+    if (moveX !== 0 && moveY !== 0) {
+
+        moveX *= 0.707;
+        moveY *= 0.707;
+
+    }
+
+
+    player.x += moveX * player.speed;
+    player.y += moveY * player.speed;
+
 }
 
 
 // ===============================
-// VẼ NGƯỜI CHƠI
+// VẼ NỀN PIXEL
+// ===============================
+
+function drawGround() {
+
+    // Nền cỏ
+
+    ctx.fillStyle = "#4f913e";
+
+    ctx.fillRect(
+        0,
+        0,
+        canvas.width,
+        canvas.height
+    );
+
+
+    const pixelSize = 12;
+
+
+    // Tọa độ thế giới đang nhìn thấy
+
+    const startX =
+        Math.floor(
+            (player.x - canvas.width / 2) /
+            pixelSize
+        );
+
+    const startY =
+        Math.floor(
+            (player.y - canvas.height / 2) /
+            pixelSize
+        );
+
+
+    const endX =
+        startX +
+        Math.ceil(canvas.width / pixelSize) +
+        2;
+
+    const endY =
+        startY +
+        Math.ceil(canvas.height / pixelSize) +
+        2;
+
+
+    // Sinh chi tiết cỏ tự nhiên
+
+    for (
+        let worldY = startY;
+        worldY < endY;
+        worldY++
+    ) {
+
+        for (
+            let worldX = startX;
+            worldX < endX;
+            worldX++
+        ) {
+
+            const r =
+                random(
+                    worldX,
+                    worldY,
+                    1
+                );
+
+
+            const screenX =
+                worldX * pixelSize -
+                player.x +
+                canvas.width / 2;
+
+            const screenY =
+                worldY * pixelSize -
+                player.y +
+                canvas.height / 2;
+
+
+            // Cỏ đậm ngẫu nhiên
+
+            if (r > 0.82) {
+
+                ctx.fillStyle = "#3f7f34";
+
+                ctx.fillRect(
+                    screenX + 3,
+                    screenY + 4,
+                    2,
+                    5
+                );
+
+                ctx.fillRect(
+                    screenX + 7,
+                    screenY + 2,
+                    2,
+                    7
+                );
+
+            }
+
+
+            // Cỏ sáng
+
+            if (r > 0.74 && r < 0.78) {
+
+                ctx.fillStyle = "#70ae48";
+
+                ctx.fillRect(
+                    screenX + 5,
+                    screenY + 5,
+                    2,
+                    4
+                );
+
+            }
+
+        }
+
+    }
+
+}
+
+
+// ===============================
+// VẼ NHÂN VẬT PIXEL
 // ===============================
 
 function drawPlayer() {
 
-    const x = canvas.width / 2;
-    const y = canvas.height / 2;
+    const x =
+        Math.floor(canvas.width / 2);
+
+    const y =
+        Math.floor(canvas.height / 2);
 
 
-    // Bóng
-    ctx.fillStyle = "rgba(0,0,0,0.25)";
+    // BÓNG
 
-    ctx.beginPath();
+    ctx.fillStyle =
+        "rgba(0,0,0,0.25)";
 
-    ctx.ellipse(
-        x,
-        y + 16,
+    ctx.fillRect(
+        x - 10,
+        y + 13,
+        20,
+        5
+    );
+
+
+    // CHÂN
+
+    ctx.fillStyle = "#2c2c32";
+
+    ctx.fillRect(
+        x - 8,
+        y + 8,
+        6,
+        10
+    );
+
+    ctx.fillRect(
+        x + 2,
+        y + 8,
+        6,
+        10
+    );
+
+
+    // ÁO
+
+    ctx.fillStyle = "#34495e";
+
+    ctx.fillRect(
+        x - 9,
+        y - 5,
         18,
-        7,
-        0,
-        0,
-        Math.PI * 2
+        14
     );
 
-    ctx.fill();
 
+    // TAY
 
-    // Nhân vật
-    ctx.fillStyle = "#e74c3c";
+    ctx.fillStyle = "#e2a37d";
 
-    ctx.beginPath();
-
-    ctx.arc(
-        x,
-        y,
-        player.size,
-        0,
-        Math.PI * 2
-    );
-
-    ctx.fill();
-
-
-    // Mắt
-    ctx.fillStyle = "white";
-
-    ctx.beginPath();
-
-    ctx.arc(
-        x - 6,
+    ctx.fillRect(
+        x - 12,
         y - 3,
+        3,
+        9
+    );
+
+    ctx.fillRect(
+        x + 9,
+        y - 3,
+        3,
+        9
+    );
+
+
+    // ĐẦU
+
+    ctx.fillStyle = "#e2a37d";
+
+    ctx.fillRect(
+        x - 7,
+        y - 15,
+        14,
+        11
+    );
+
+
+    // TÓC
+
+    ctx.fillStyle = "#5a351f";
+
+    ctx.fillRect(
+        x - 8,
+        y - 18,
+        16,
+        5
+    );
+
+    ctx.fillRect(
+        x - 8,
+        y - 14,
         4,
-        0,
-        Math.PI * 2
+        4
     );
 
-    ctx.arc(
-        x + 6,
-        y - 3,
-        4,
-        0,
-        Math.PI * 2
-    );
 
-    ctx.fill();
+    // MẮT
 
+    if (
+        player.direction === "down"
+    ) {
 
-    ctx.fillStyle = "black";
+        ctx.fillStyle = "#222";
 
-    ctx.beginPath();
+        ctx.fillRect(
+            x - 4,
+            y - 11,
+            2,
+            2
+        );
 
-    ctx.arc(
-        x - 6,
-        y - 3,
-        2,
-        0,
-        Math.PI * 2
-    );
+        ctx.fillRect(
+            x + 2,
+            y - 11,
+            2,
+            2
+        );
 
-    ctx.arc(
-        x + 6,
-        y - 3,
-        2,
-        0,
-        Math.PI * 2
-    );
+    }
 
-    ctx.fill();
 }
 
 
 // ===============================
-// THÔNG SỐ
+// CẬP NHẬT HUD
 // ===============================
 
-function updateStats() {
+function updateHUD() {
 
-    document.getElementById("health").textContent =
-        Math.floor(player.health);
+    document.getElementById(
+        "healthText"
+    ).textContent =
+        player.health + "/100";
 
-    document.getElementById("hunger").textContent =
-        Math.floor(player.hunger);
 
-    document.getElementById("wood").textContent =
-        player.wood;
+    document.getElementById(
+        "energyText"
+    ).textContent =
+        player.energy + "/100";
 
-    document.getElementById("stone").textContent =
-        player.stone;
+
+    document.getElementById(
+        "healthFill"
+    ).style.width =
+        player.health + "%";
+
+
+    document.getElementById(
+        "energyFill"
+    ).style.width =
+        player.energy + "%";
+
 }
 
 
@@ -811,13 +437,14 @@ function gameLoop() {
 
     updatePlayer();
 
-    drawWorld();
+    drawGround();
 
     drawPlayer();
 
-    updateStats();
+    updateHUD();
 
     requestAnimationFrame(gameLoop);
+
 }
 
 gameLoop();
