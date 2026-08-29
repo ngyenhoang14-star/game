@@ -17,10 +17,20 @@ resizeCanvas();
 const player = {
     x: 0,
     y: 0,
+
     speed: 4,
+
     health: 100,
     energy: 100,
-    direction: "down"
+
+    direction: "down",
+
+    moving: false,
+
+    walkFrame: 0,
+    animationTime: 0,
+
+    idleTime: 0
 };
 
 const keys = {};
