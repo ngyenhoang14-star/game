@@ -1,61 +1,64 @@
 <!DOCTYPE html>
-
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sinh Tồn Đảo Hoang</title>
 
-```
-<link rel="stylesheet" href="style.css">
-```
+    <title>Sinh Tồn Pixel</title>
 
+    <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
-    <div id="gameContainer">
 
-```
-    <div id="topBar">
-        <div class="stat">
-            ❤️ <span id="health">100</span>
+    <div id="game">
+
+        <!-- GAME -->
+        <canvas id="gameCanvas"></canvas>
+
+        <!-- MÁU VÀ THỂ LỰC -->
+        <div id="hud">
+
+            <div class="barBox">
+                <div class="barText">❤ <span id="healthText">100/100</span></div>
+                <div class="bar healthBar">
+                    <div id="healthFill"></div>
+                </div>
+            </div>
+
+            <div class="barBox">
+                <div class="barText">⚡ <span id="energyText">100/100</span></div>
+                <div class="bar energyBar">
+                    <div id="energyFill"></div>
+                </div>
+            </div>
+
         </div>
 
-        <div class="stat">
-            🍗 <span id="hunger">100</span>
+        <!-- HƯỚNG DẪN -->
+        <div id="controls">
+            <b>W A S D:</b> Di chuyển<br>
+            <b>E:</b> Tương tác<br>
+            <b>I:</b> Túi đồ
         </div>
 
-        <div class="stat">
-            🌳 Gỗ: <span id="wood">0</span>
+        <!-- HOTBAR -->
+        <div id="hotbar">
+
+            <div class="slot selected">1<br>🪓</div>
+            <div class="slot">2<br>⛏️</div>
+            <div class="slot">3<br></div>
+            <div class="slot">4<br></div>
+            <div class="slot">5<br></div>
+            <div class="slot">6<br></div>
+            <div class="slot">7<br></div>
+            <div class="slot">8<br></div>
+
         </div>
 
-        <div class="stat">
-            🪨 Đá: <span id="stone">0</span>
-        </div>
     </div>
 
-    <canvas id="gameCanvas"></canvas>
-
-    <div id="message">
-        🌴 Chào mừng đến đảo hoang! Hãy tìm cây và đá để sinh tồn.
-    </div>
-
-    <div id="mobileControls">
-        <button id="up">▲</button>
-
-        <div class="middleControls">
-            <button id="left">◀</button>
-            <button id="down">▼</button>
-            <button id="right">▶</button>
-        </div>
-
-        <button id="action">⛏️<br>Thu thập</button>
-    </div>
-
-</div>
-
-<script src="script.js"></script>
-```
+    <script src="script.js"></script>
 
 </body>
 </html>
