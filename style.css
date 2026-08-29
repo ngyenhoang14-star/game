@@ -1,1 +1,486 @@
+/* =========================
+   RESET
+========================= */
 
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    -webkit-tap-highlight-color: transparent;
+    -webkit-user-select: none;
+    user-select: none;
+}
+
+html,
+body {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: #111;
+    font-family: Arial, sans-serif;
+    touch-action: none;
+}
+
+
+/* =========================
+   GAME
+========================= */
+
+#game {
+    position: fixed;
+    inset: 0;
+    width: 100vw;
+    height: 100dvh;
+    overflow: hidden;
+    background: #579b4b;
+}
+
+#canvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    display: block;
+
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
+}
+
+
+/* =========================
+   HUD
+========================= */
+
+#hud {
+    position: absolute;
+    z-index: 10;
+
+    top: 15px;
+    left: 15px;
+
+    width: 190px;
+
+    padding: 10px;
+
+    color: white;
+
+    background: rgba(35, 29, 22, 0.88);
+    border: 3px solid #7d684a;
+
+    box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.35);
+}
+
+.stat {
+    margin-bottom: 8px;
+}
+
+.stat:last-child {
+    margin-bottom: 0;
+}
+
+.stat-title {
+    display: flex;
+    justify-content: space-between;
+
+    margin-bottom: 4px;
+
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.bar {
+    width: 100%;
+    height: 14px;
+
+    overflow: hidden;
+
+    background: #171717;
+    border: 2px solid #111;
+}
+
+.bar-fill {
+    width: 100%;
+    height: 100%;
+
+    transition: width 0.15s linear;
+}
+
+.health {
+    background: #d94b4b;
+}
+
+.energy {
+    background: #e0b53f;
+}
+
+
+/* =========================
+   THÔNG BÁO
+========================= */
+
+#message {
+    position: absolute;
+    z-index: 20;
+
+    top: 15px;
+    left: 50%;
+
+    transform: translateX(-50%);
+
+    max-width: 300px;
+
+    padding: 8px 14px;
+
+    color: white;
+    font-size: 13px;
+    text-align: center;
+
+    background: rgba(25, 25, 25, 0.75);
+    border: 2px solid #7d684a;
+
+    pointer-events: none;
+}
+
+
+/* =========================
+   HOTBAR
+========================= */
+
+#hotbar {
+    position: absolute;
+    z-index: 30;
+
+    left: 50%;
+    bottom: 18px;
+
+    transform: translateX(-50%);
+
+    display: flex;
+
+    padding: 4px;
+
+    background: rgba(35, 30, 23, 0.94);
+    border: 3px solid #6d5a40;
+
+    box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.35);
+}
+
+.slot {
+    position: relative;
+
+    width: 58px;
+    height: 58px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    margin: 1px;
+
+    background: #40382d;
+    border: 2px solid #79664b;
+
+    color: white;
+}
+
+.slot.selected {
+    background: #5c4f3b;
+    border: 3px solid #e7c45b;
+}
+
+.number {
+    position: absolute;
+
+    top: 2px;
+    left: 4px;
+
+    font-size: 10px;
+}
+
+.icon {
+    font-size: 26px;
+}
+
+
+/* =========================
+   HƯỚNG DẪN PC
+========================= */
+
+#pcHelp {
+    position: absolute;
+    z-index: 10;
+
+    top: 15px;
+    right: 15px;
+
+    padding: 10px 13px;
+
+    color: white;
+    font-size: 13px;
+    line-height: 1.7;
+
+    background: rgba(35, 29, 22, 0.85);
+    border: 2px solid #6d5a40;
+}
+
+
+/* =========================
+   ĐIỀU KHIỂN ĐIỆN THOẠI
+========================= */
+
+#mobileControls {
+    display: none;
+
+    position: absolute;
+    z-index: 100;
+
+    inset: 0;
+
+    pointer-events: none;
+}
+
+
+/* CỤM NÚT DI CHUYỂN */
+
+#dpad {
+    position: absolute;
+
+    left: 20px;
+    bottom: 25px;
+
+    width: 174px;
+    height: 174px;
+
+    pointer-events: auto;
+}
+
+.move-button {
+    position: absolute;
+
+    width: 56px;
+    height: 56px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border: 3px solid rgba(255, 255, 255, 0.3);
+    border-radius: 14px;
+
+    background: rgba(38, 38, 38, 0.82);
+
+    color: white;
+    font-size: 26px;
+
+    box-shadow: 0 5px 0 rgba(0, 0, 0, 0.35);
+
+    touch-action: none;
+}
+
+.move-button:active {
+    transform: translateY(3px);
+    background: rgba(95, 95, 95, 0.95);
+}
+
+#upButton {
+    left: 59px;
+    top: 0;
+}
+
+#leftButton {
+    left: 0;
+    top: 59px;
+}
+
+#rightButton {
+    right: 0;
+    top: 59px;
+}
+
+#downButton {
+    left: 59px;
+    bottom: 0;
+}
+
+
+/* =========================
+   NÚT HÀNH ĐỘNG
+========================= */
+
+#actionButtons {
+    position: absolute;
+
+    right: 22px;
+    bottom: 25px;
+
+    display: flex;
+    flex-direction: column;
+
+    gap: 12px;
+
+    pointer-events: auto;
+}
+
+.action-button {
+    width: 70px;
+    height: 70px;
+
+    border: 3px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+
+    background: rgba(38, 38, 38, 0.85);
+
+    color: white;
+    font-size: 30px;
+
+    box-shadow: 0 5px 0 rgba(0, 0, 0, 0.35);
+
+    touch-action: none;
+}
+
+.action-button.small {
+    width: 56px;
+    height: 56px;
+
+    align-self: center;
+
+    font-size: 24px;
+}
+
+.action-button:active {
+    transform: translateY(3px);
+    background: rgba(95, 95, 95, 0.95);
+}
+
+
+/* =========================
+   TÚI ĐỒ
+========================= */
+
+#inventory {
+    position: absolute;
+    z-index: 500;
+
+    inset: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background: rgba(0, 0, 0, 0.55);
+}
+
+#inventory.hidden {
+    display: none;
+}
+
+#inventoryBox {
+    width: min(360px, 90vw);
+
+    padding: 20px;
+
+    color: white;
+
+    background: #30281f;
+    border: 4px solid #8a704d;
+
+    box-shadow: 6px 6px 0 rgba(0, 0, 0, 0.45);
+}
+
+#inventoryBox h2 {
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+#inventoryItems {
+    display: flex;
+    flex-direction: column;
+
+    gap: 8px;
+}
+
+.inventory-item {
+    padding: 10px;
+
+    background: #44392c;
+    border: 2px solid #6d5a40;
+}
+
+#closeInventory {
+    width: 100%;
+
+    margin-top: 15px;
+    padding: 10px;
+
+    border: 2px solid #9b8055;
+
+    background: #5d4b36;
+
+    color: white;
+
+    cursor: pointer;
+}
+
+
+/* =========================
+   ĐIỆN THOẠI
+========================= */
+
+@media (max-width: 800px), (pointer: coarse) {
+
+    #mobileControls {
+        display: block !important;
+    }
+
+    #pcHelp {
+        display: none;
+    }
+
+    #hud {
+        top: 8px;
+        left: 8px;
+
+        transform: scale(0.78);
+        transform-origin: top left;
+    }
+
+    #message {
+        top: 8px;
+
+        max-width: 180px;
+
+        font-size: 11px;
+    }
+
+    #hotbar {
+        bottom: 5px;
+
+        transform:
+            translateX(-50%)
+            scale(0.72);
+
+        transform-origin: bottom center;
+    }
+}
+
+
+/* MÀN HÌNH RẤT NHỎ */
+
+@media (max-width: 420px) {
+
+    #dpad {
+        left: 8px;
+        bottom: 10px;
+
+        transform: scale(0.88);
+        transform-origin: bottom left;
+    }
+
+    #actionButtons {
+        right: 10px;
+        bottom: 15px;
+
+        transform: scale(0.88);
+        transform-origin: bottom right;
+    }
+}
