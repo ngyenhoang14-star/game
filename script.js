@@ -2,8 +2,6 @@ const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
 
 // Kích thước màn hình game thật
-canvas.width = 900;
-canvas.height = 600;
 
 // =======================
 // NHÂN VẬT
