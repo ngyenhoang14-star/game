@@ -144,13 +144,44 @@ function updatePlayer() {
         player.direction = "right";
     }
 
+
+    // KIỂM TRA CÓ ĐANG DI CHUYỂN KHÔNG
+
+    player.moving =
+        moveX !== 0 ||
+        moveY !== 0;
+
+
+    // ĐI CHÉO KHÔNG NHANH HƠN
+
     if (moveX !== 0 && moveY !== 0) {
         moveX *= 0.707;
         moveY *= 0.707;
     }
 
+
+    // DI CHUYỂN
+
     player.x += moveX * player.speed;
     player.y += moveY * player.speed;
+
+
+    // ANIMATION ĐI BỘ
+
+    if (player.moving) {
+
+        player.animationTime += 0.18;
+
+        player.walkFrame =
+            Math.sin(player.animationTime) * 4;
+
+    } else {
+
+        player.idleTime += 0.08;
+
+        player.walkFrame = 0;
+
+    }
 }
 
 
