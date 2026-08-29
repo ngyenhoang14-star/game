@@ -1,0 +1,101 @@
+* {
+  box-sizing: border-box;
+  }
+
+body {
+margin: 0;
+background: #222;
+font-family: Arial, sans-serif;
+color: white;
+display: flex;
+justify-content: center;
+}
+
+#gameContainer {
+width: 100%;
+max-width: 1000px;
+min-height: 100vh;
+position: relative;
+text-align: center;
+background: #333;
+}
+
+#topBar {
+min-height: 50px;
+padding: 8px;
+display: flex;
+justify-content: center;
+gap: 15px;
+flex-wrap: wrap;
+background: #181818;
+}
+
+.stat {
+background: #444;
+padding: 7px 12px;
+border-radius: 8px;
+font-size: 16px;
+}
+
+#gameCanvas {
+display: block;
+width: 100%;
+height: auto;
+background: #4d9b45;
+image-rendering: pixelated;
+touch-action: none;
+}
+
+#message {
+padding: 10px;
+background: #252525;
+font-size: 14px;
+}
+
+#mobileControls {
+display: none;
+padding: 12px;
+user-select: none;
+touch-action: none;
+}
+
+#mobileControls button {
+width: 65px;
+height: 55px;
+margin: 3px;
+border: none;
+border-radius: 10px;
+background: #555;
+color: white;
+font-size: 24px;
+}
+
+#mobileControls #action {
+width: 100px;
+height: 65px;
+font-size: 14px;
+}
+
+.middleControls {
+display: flex;
+justify-content: center;
+}
+
+/* Hiện nút điều khiển khi dùng màn hình nhỏ */
+@media (max-width: 768px) {
+#mobileControls {
+display: block;
+}
+
+```
+#topBar {
+    gap: 5px;
+}
+
+.stat {
+    font-size: 13px;
+    padding: 5px 7px;
+}
+```
+
+}
