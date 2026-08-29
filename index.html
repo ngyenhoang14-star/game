@@ -1,1 +1,221 @@
 
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+
+    <!-- Giúp game hiển thị tốt trên điện thoại -->
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"
+    >
+
+    <title>Pixel Farm</title>
+
+    <!-- File giao diện -->
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <!-- GAME -->
+    <div id="game">
+
+        <!-- Màn hình game -->
+        <canvas id="canvas"></canvas>
+
+
+        <!-- GIAO DIỆN MÁU + THỂ LỰC -->
+        <div id="hud">
+
+            <div class="stat">
+                <div class="stat-title">
+                    ❤️ Máu
+                    <span id="healthText">100</span>
+                </div>
+
+                <div class="bar">
+                    <div
+                        class="bar-fill health"
+                        id="healthBar"
+                    ></div>
+                </div>
+            </div>
+
+
+            <div class="stat">
+                <div class="stat-title">
+                    ⚡ Thể lực
+                    <span id="energyText">100</span>
+                </div>
+
+                <div class="bar">
+                    <div
+                        class="bar-fill energy"
+                        id="energyBar"
+                    ></div>
+                </div>
+            </div>
+
+        </div>
+
+
+        <!-- THÔNG BÁO -->
+        <div id="message">
+            Chào mừng đến thế giới Pixel Farm!
+        </div>
+
+
+        <!-- HOTBAR -->
+        <div id="hotbar">
+
+            <div class="slot selected" data-slot="0">
+                <span class="number">1</span>
+                <span class="icon">🪓</span>
+            </div>
+
+            <div class="slot" data-slot="1">
+                <span class="number">2</span>
+                <span class="icon">⛏️</span>
+            </div>
+
+            <div class="slot" data-slot="2">
+                <span class="number">3</span>
+                <span class="icon">🌱</span>
+            </div>
+
+            <div class="slot" data-slot="3">
+                <span class="number">4</span>
+                <span class="icon">🪵</span>
+            </div>
+
+            <div class="slot" data-slot="4">
+                <span class="number">5</span>
+                <span class="icon">🪨</span>
+            </div>
+
+        </div>
+
+
+        <!-- HƯỚNG DẪN MÁY TÍNH -->
+        <div id="pcHelp">
+            <b>WASD</b> di chuyển<br>
+            <b>E</b> tương tác<br>
+            <b>1 - 5</b> chọn đồ
+        </div>
+
+
+        <!-- ĐIỀU KHIỂN ĐIỆN THOẠI -->
+        <div id="mobileControls">
+
+            <!-- NÚT DI CHUYỂN -->
+            <div id="dpad">
+
+                <button
+                    class="move-button"
+                    id="upButton"
+                    type="button"
+                >
+                    ▲
+                </button>
+
+                <button
+                    class="move-button"
+                    id="leftButton"
+                    type="button"
+                >
+                    ◀
+                </button>
+
+                <button
+                    class="move-button"
+                    id="rightButton"
+                    type="button"
+                >
+                    ▶
+                </button>
+
+                <button
+                    class="move-button"
+                    id="downButton"
+                    type="button"
+                >
+                    ▼
+                </button>
+
+            </div>
+
+
+            <!-- NÚT HÀNH ĐỘNG -->
+            <div id="actionButtons">
+
+                <button
+                    id="actionButton"
+                    class="action-button"
+                    type="button"
+                >
+                    🪓
+                </button>
+
+                <button
+                    id="inventoryButton"
+                    class="action-button small"
+                    type="button"
+                >
+                    🎒
+                </button>
+
+            </div>
+
+        </div>
+
+
+        <!-- TÚI ĐỒ -->
+        <div id="inventory" class="hidden">
+
+            <div id="inventoryBox">
+
+                <h2>🎒 Túi đồ</h2>
+
+                <div id="inventoryItems">
+
+                    <div class="inventory-item">
+                        🪵 Gỗ:
+                        <span id="woodCount">0</span>
+                    </div>
+
+                    <div class="inventory-item">
+                        🪨 Đá:
+                        <span id="stoneCount">0</span>
+                    </div>
+
+                    <div class="inventory-item">
+                        🌱 Hạt giống:
+                        <span id="seedCount">5</span>
+                    </div>
+
+                </div>
+
+
+                <button
+                    id="closeInventory"
+                    type="button"
+                >
+                    Đóng
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- CODE THẾ GIỚI -->
+    <script src="world.js"></script>
+
+    <!-- CODE GAME -->
+    <script src="game.js"></script>
+
+</body>
+</html>
