@@ -1,375 +1,326 @@
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
 
-// Kích thước màn hình game thật
-function resizeCanvas() {
-    canvas.width = canvas.clientWidth;
-    canvas.height = canvas.clientHeight;
-}
-
-window.addEventListener("resize", resizeCanvas);
-
-resizeCanvas();
-
-// =======================
-// NHÂN VẬT
-// =======================
+canvas.width = 1200;
+canvas.height = 700;
 
 const player = {
-x: 450,
-y: 300,
-size: 18,
-speed: 3,
-health: 100,
-hunger: 100,
-wood: 0,
-stone: 0
+    x: 600,
+    y: 350,
+    size: 18,
+    speed: 4,
+    health: 100,
+    hunger: 100,
+    wood: 0,
+    stone: 0
 };
 
 const keys = {};
 
-document.addEventListener("keydown", (event) => {
-keys[event.key.toLowerCase()] = true;
+document.addEventListener("keydown", function (event) {
+    keys[event.key.toLowerCase()] = true;
 });
 
-document.addEventListener("keyup", (event) => {
-keys[event.key.toLowerCase()] = false;
+document.addEventListener("keyup", function (event) {
+    keys[event.key.toLowerCase()] = false;
 });
 
-// =======================
-// THẾ GIỚI
-// =======================
-
-const worldSize = 60;
-const tileSize = 32;
-
-const world = [];
-
-// Tạo map ngẫu nhiên
-for (let y = 0; y < worldSize; y++) {
-world[y] = [];
-
-```
-for (let x = 0; x < worldSize; x++) {
-    const random = Math.random();
-
-    let type = "grass";
-
-    if (random < 0.08) {
-        type = "water";
-    } else if (random < 0.15) {
-        type = "sand";
-    } else if (random < 0.25) {
-        type = "forest";
-    } else if (random < 0.30) {
-        type = "stone";
-    } else if (random < 0.33) {
-        type = "coal";
-    } else if (random < 0.35) {
-        type = "iron";
-    } else if (random < 0.36) {
-        type = "gold";
-    }
-
-    world[y][x] = type;
-}
-```
-
-}
-
-// =======================
-// SINH VẬT
-// =======================
-
-const animals = [
-{ x: 200, y: 200, type: "sheep", dx: 0, dy: 0 },
-{ x: 650, y: 400, type: "cow", dx: 0, dy: 0 },
-{ x: 350, y: 500, type: "chicken", dx: 0, dy: 0 }
+/* CÂY */
+const trees = [
+    {x: 200, y: 150},
+    {x: 280, y: 220},
+    {x: 350, y: 130},
+    {x: 900, y: 150},
+    {x: 1000, y: 230},
+    {x: 850, y: 300},
+    {x: 180, y: 500},
+    {x: 300, y: 550},
+    {x: 1000, y: 500},
+    {x: 900, y: 600}
 ];
 
-// =======================
-// MÀU CÁC Ô
-// =======================
+/* ĐÁ */
+const rocks = [
+    {x: 450, y: 180},
+    {x: 550, y: 130},
+    {x: 700, y: 180},
+    {x: 400, y: 550},
+    {x: 700, y: 550},
+    {x: 800, y: 500}
+];
 
-const colors = {
-grass: "#55a630",
-water: "#219ebc",
-sand: "#e9c46a",
-forest: "#2d6a4f",
-stone: "#6c757d",
-coal: "#343a40",
-iron: "#a47148",
-gold: "#f4d35e"
-};
+/* SINH VẬT */
+const animals = [
+    {x: 400, y: 350, type: "sheep"},
+    {x: 800, y: 400, type: "cow"},
+    {x: 650, y: 250, type: "chicken"}
+];
 
-// =======================
-// VẼ THẾ GIỚI
-// =======================
+function updatePlayer() {
+    if (keys["w"] || keys["arrowup"]) {
+        player.y -= player.speed;
+    }
 
-function drawWorld() {
-const cameraX = player.x - canvas.width / 2;
-const cameraY = player.y - canvas.height / 2;
+    if (keys["s"] || keys["arrowdown"]) {
+        player.y += player.speed;
+    }
 
-```
-for (let y = 0; y < worldSize; y++) {
-    for (let x = 0; x < worldSize; x++) {
-        const type = world[y][x];
+    if (keys["a"] || keys["arrowleft"]) {
+        player.x -= player.speed;
+    }
 
-        const screenX = x * tileSize - cameraX;
-        const screenY = y * tileSize - cameraY;
+    if (keys["d"] || keys["arrowright"]) {
+        player.x += player.speed;
+    }
 
-        // Chỉ vẽ những ô đang nhìn thấy
-        if (
-            screenX > -tileSize &&
-            screenX < canvas.width &&
-            screenY > -tileSize &&
-            screenY < canvas.height
-        ) {
-            ctx.fillStyle = colors[type];
-            ctx.fillRect(screenX, screenY, tileSize, tileSize);
+    /* Không đi ra ngoài bản đồ */
+    if (player.x < player.size) {
+        player.x = player.size;
+    }
 
-            // Vẽ cây
-            if (type === "forest") {
-                ctx.fillStyle = "#6b3e26";
-                ctx.fillRect(
-                    screenX + 13,
-                    screenY + 18,
-                    6,
-                    11
-                );
+    if (player.x > canvas.width - player.size) {
+        player.x = canvas.width - player.size;
+    }
 
-                ctx.fillStyle = "#1b5e20";
-                ctx.beginPath();
-                ctx.arc(
-                    screenX + 16,
-                    screenY + 12,
-                    11,
-                    0,
-                    Math.PI * 2
-                );
-                ctx.fill();
-            }
+    if (player.y < player.size) {
+        player.y = player.size;
+    }
 
-            // Vẽ đá
-            if (type === "stone") {
-                ctx.fillStyle = "#adb5bd";
-                ctx.beginPath();
-                ctx.arc(
-                    screenX + 16,
-                    screenY + 16,
-                    10,
-                    0,
-                    Math.PI * 2
-                );
-                ctx.fill();
-            }
+    if (player.y > canvas.height - player.size) {
+        player.y = canvas.height - player.size;
+    }
+}
 
-            // Vẽ than
-            if (type === "coal") {
-                ctx.fillStyle = "#111";
-                ctx.beginPath();
-                ctx.arc(
-                    screenX + 16,
-                    screenY + 16,
-                    9,
-                    0,
-                    Math.PI * 2
-                );
-                ctx.fill();
-            }
+/* VẼ CỎ */
+function drawGround() {
+    ctx.fillStyle = "#4d963f";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-            // Vẽ sắt
-            if (type === "iron") {
-                ctx.fillStyle = "#c77dff";
-                ctx.beginPath();
-                ctx.arc(
-                    screenX + 16,
-                    screenY + 16,
-                    9,
-                    0,
-                    Math.PI * 2
-                );
-                ctx.fill();
-            }
-
-            // Vẽ vàng
-            if (type === "gold") {
-                ctx.fillStyle = "#ffd60a";
-                ctx.beginPath();
-                ctx.arc(
-                    screenX + 16,
-                    screenY + 16,
-                    9,
-                    0,
-                    Math.PI * 2
-                );
-                ctx.fill();
-            }
+    /* Chấm cỏ */
+    for (let x = 0; x < canvas.width; x += 40) {
+        for (let y = 0; y < canvas.height; y += 40) {
+            ctx.fillStyle = "#438a37";
+            ctx.fillRect(x + 10, y + 15, 2, 5);
+            ctx.fillRect(x + 25, y + 5, 2, 5);
         }
     }
 }
-```
 
-}
-
-// =======================
-// VẼ SINH VẬT
-// =======================
-
-function drawAnimals() {
-const cameraX = player.x - canvas.width / 2;
-const cameraY = player.y - canvas.height / 2;
-
-```
-for (const animal of animals) {
-    const screenX = animal.x - cameraX;
-    const screenY = animal.y - cameraY;
-
-    if (animal.type === "sheep") {
-        ctx.fillStyle = "white";
-    } else if (animal.type === "cow") {
-        ctx.fillStyle = "#5c4033";
-    } else {
-        ctx.fillStyle = "#f1c40f";
-    }
+/* VẼ HỒ NƯỚC */
+function drawWater() {
+    ctx.fillStyle = "#2498d1";
 
     ctx.beginPath();
-    ctx.arc(screenX, screenY, 12, 0, Math.PI * 2);
+    ctx.ellipse(
+        600,
+        400,
+        150,
+        80,
+        0,
+        0,
+        Math.PI * 2
+    );
+
+    ctx.fill();
+
+    ctx.fillStyle = "#5fc3f3";
+
+    for (let x = 500; x < 700; x += 40) {
+        ctx.fillRect(x, 390, 20, 3);
+    }
+}
+
+/* VẼ CÂY */
+function drawTrees() {
+    for (const tree of trees) {
+
+        /* Thân cây */
+        ctx.fillStyle = "#704214";
+        ctx.fillRect(
+            tree.x - 7,
+            tree.y,
+            14,
+            25
+        );
+
+        /* Tán cây */
+        ctx.fillStyle = "#176b2c";
+
+        ctx.beginPath();
+        ctx.arc(
+            tree.x,
+            tree.y - 12,
+            28,
+            0,
+            Math.PI * 2
+        );
+
+        ctx.fill();
+
+        ctx.fillStyle = "#25833a";
+
+        ctx.beginPath();
+        ctx.arc(
+            tree.x - 12,
+            tree.y - 20,
+            16,
+            0,
+            Math.PI * 2
+        );
+
+        ctx.fill();
+    }
+}
+
+/* VẼ ĐÁ */
+function drawRocks() {
+    for (const rock of rocks) {
+
+        ctx.fillStyle = "#777";
+
+        ctx.beginPath();
+
+        ctx.arc(
+            rock.x,
+            rock.y,
+            20,
+            0,
+            Math.PI * 2
+        );
+
+        ctx.fill();
+
+        ctx.fillStyle = "#aaa";
+
+        ctx.beginPath();
+
+        ctx.arc(
+            rock.x - 6,
+            rock.y - 7,
+            7,
+            0,
+            Math.PI * 2
+        );
+
+        ctx.fill();
+    }
+}
+
+/* VẼ SINH VẬT */
+function drawAnimals() {
+    for (const animal of animals) {
+
+        if (animal.type === "sheep") {
+            ctx.fillStyle = "white";
+        }
+
+        if (animal.type === "cow") {
+            ctx.fillStyle = "#704214";
+        }
+
+        if (animal.type === "chicken") {
+            ctx.fillStyle = "#f5d142";
+        }
+
+        ctx.beginPath();
+
+        ctx.arc(
+            animal.x,
+            animal.y,
+            18,
+            0,
+            Math.PI * 2
+        );
+
+        ctx.fill();
+
+        /* Mắt */
+        ctx.fillStyle = "black";
+
+        ctx.beginPath();
+
+        ctx.arc(
+            animal.x + 6,
+            animal.y - 3,
+            3,
+            0,
+            Math.PI * 2
+        );
+
+        ctx.fill();
+    }
+}
+
+/* VẼ NHÂN VẬT */
+function drawPlayer() {
+
+    /* Bóng */
+    ctx.fillStyle = "rgba(0, 0, 0, 0.25)";
+
+    ctx.beginPath();
+    ctx.ellipse(
+        player.x,
+        player.y + 17,
+        18,
+        7,
+        0,
+        0,
+        Math.PI * 2
+    );
+    ctx.fill();
+
+    /* Người chơi */
+    ctx.fillStyle = "#e74c3c";
+
+    ctx.beginPath();
+    ctx.arc(
+        player.x,
+        player.y,
+        player.size,
+        0,
+        Math.PI * 2
+    );
+    ctx.fill();
+
+    /* Mắt */
+    ctx.fillStyle = "white";
+
+    ctx.beginPath();
+    ctx.arc(player.x - 6, player.y - 3, 4, 0, Math.PI * 2);
+    ctx.arc(player.x + 6, player.y - 3, 4, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.fillStyle = "black";
+
+    ctx.beginPath();
+    ctx.arc(player.x - 6, player.y - 3, 2, 0, Math.PI * 2);
+    ctx.arc(player.x + 6, player.y - 3, 2, 0, Math.PI * 2);
     ctx.fill();
 }
-```
 
-}
-
-// =======================
-// DI CHUYỂN
-// =======================
-
-function updatePlayer() {
-let newX = player.x;
-let newY = player.y;
-
-```
-if (keys["w"]) newY -= player.speed;
-if (keys["s"]) newY += player.speed;
-if (keys["a"]) newX -= player.speed;
-if (keys["d"]) newX += player.speed;
-
-// Kiểm tra không đi vào nước
-const tileX = Math.floor(newX / tileSize);
-const tileY = Math.floor(newY / tileSize);
-
-if (
-    world[tileY] &&
-    world[tileY][tileX] !== "water"
-) {
-    player.x = newX;
-    player.y = newY;
-}
-```
-
-}
-
-// =======================
-// SINH VẬT DI CHUYỂN
-// =======================
-
-function updateAnimals() {
-for (const animal of animals) {
-if (Math.random() < 0.02) {
-animal.dx = (Math.random() - 0.5) * 1.5;
-animal.dy = (Math.random() - 0.5) * 1.5;
-}
-
-```
-    animal.x += animal.dx;
-    animal.y += animal.dy;
-}
-```
-
-}
-
-// =======================
-// VẼ NHÂN VẬT
-// =======================
-
-function drawPlayer() {
-ctx.fillStyle = "#ff6b6b";
-
-```
-ctx.beginPath();
-ctx.arc(
-    canvas.width / 2,
-    canvas.height / 2,
-    player.size,
-    0,
-    Math.PI * 2
-);
-
-ctx.fill();
-
-// Mắt
-ctx.fillStyle = "white";
-ctx.beginPath();
-ctx.arc(
-    canvas.width / 2 - 6,
-    canvas.height / 2 - 3,
-    3,
-    0,
-    Math.PI * 2
-);
-ctx.arc(
-    canvas.width / 2 + 6,
-    canvas.height / 2 - 3,
-    3,
-    0,
-    Math.PI * 2
-);
-ctx.fill();
-```
-
-}
-
-// =======================
-// CẬP NHẬT CHỈ SỐ
-// =======================
-
+/* CẬP NHẬT THÔNG SỐ */
 function updateStats() {
-document.getElementById("health").textContent =
-Math.floor(player.health);
-
-```
-document.getElementById("hunger").textContent =
-    Math.floor(player.hunger);
-
-document.getElementById("wood").textContent =
-    player.wood;
-
-document.getElementById("stone").textContent =
-    player.stone;
-```
-
+    document.getElementById("health").textContent = player.health;
+    document.getElementById("hunger").textContent = player.hunger;
+    document.getElementById("wood").textContent = player.wood;
+    document.getElementById("stone").textContent = player.stone;
 }
 
-// =======================
-// GAME LOOP
-// =======================
-
+/* GAME LOOP */
 function gameLoop() {
-updatePlayer();
-updateAnimals();
 
-```
-ctx.clearRect(0, 0, canvas.width, canvas.height);
+    updatePlayer();
 
-drawWorld();
-drawAnimals();
-drawPlayer();
-updateStats();
+    drawGround();
+    drawWater();
+    drawTrees();
+    drawRocks();
+    drawAnimals();
+    drawPlayer();
 
-requestAnimationFrame(gameLoop);
-```
+    updateStats();
 
+    requestAnimationFrame(gameLoop);
 }
 
 gameLoop();
