@@ -2,6 +2,14 @@ const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
 
 // Kích thước màn hình game thật
+function resizeCanvas() {
+    canvas.width = canvas.clientWidth;
+    canvas.height = canvas.clientHeight;
+}
+
+window.addEventListener("resize", resizeCanvas);
+
+resizeCanvas();
 
 // =======================
 // NHÂN VẬT
